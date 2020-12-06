@@ -1,22 +1,22 @@
 // Copyright 2020 Merzlov Nikolay merzlovnik@mail.ru
 
 #include <header.hpp>
+#include <random>
 
-using boost::asio::ip::tcp;
 using boost::asio::buffer;
+using boost::asio::ip::tcp;
 
 boost::asio::io_service service;
 
 class talk_to_svr {
   tcp::socket sock_;
-  enum { max_msg = 1024 };
   int already_read_;
-  char buff_[max_msg];
+  char buff_[1024];
   bool started_;
   std::string username_;
 
  public:
-  talk_to_svr(const std::string& username)
+  explicit talk_to_svr(const std::string& username)
       : sock_(service), started_(true), username_(username) {}
 
   void connect(tcp::endpoint ep) { sock_.connect(ep); }
@@ -75,7 +75,7 @@ class talk_to_svr {
     while (started_) {
       write_request();
       read_answer();
-      boost::this_thread::sleep(boost::posix_time::millisec(rand() % 7000));
+      boost::this_thread::sleep(boost::posix_time::millisec(rand_r(0) % 7000));
     }
   }
 
